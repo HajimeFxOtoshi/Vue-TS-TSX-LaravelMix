@@ -3,3 +3,225 @@ Repository for Test
 
 Setting up laravel mix + Vue.js + TypeScript + TSX
 
+
+
+## create laravel project
+`composer create-project --prefer-dist laravel/laravel Vue-TSX-LaravelMix`
+
+
+## install node_modules
+`cd Vue-TSX-LaravelMix`
+
+```npm install
+npm install --save-dev @babel/plugin-syntax-jsx
+npm install --save-dev @vue/babel-plugin-transform-vue-jsx
+npm install --save-dev @vue/babel-helper-vue-jsx-merge-props
+npm install --save-dev @babel/plugin-syntax-jsx @vue/babel-plugin-transform-vue-jsx @vue/babel-helper-vue-jsx-merge-props
+npm install --save-dev vue-property-decorator
+```
+
+
+## create babel config file
+create file named '.babelrc'
+
+```{
+    "plugins": ["@vue/babel-plugin-transform-vue-jsx"]
+}
+```
+
+
+
+## create ts config file
+create file named 'tsconfig.json'
+
+```{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "esnext",
+    "strict": true,
+    "jsx": "preserve",
+    "importHelpers": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "types": [
+      "node",
+      "jquery"
+    ],
+    "paths": {
+      "@/*": [
+        "resources/js/*"
+      ]
+    },
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost"
+    ]
+  },
+  "include": [
+    "resources/js/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
+```
+
+
+
+## create route for test page
+modify ./routes/web.php
+
+```Route::get('/', function () {
+    return view('welcome');
+});
+
+// append this part
+Route::get('/test', function () {
+    return view('test');
+});
+```
+
+
+
+## create view for test page
+create file ./resources/views/test.blade.php
+
+```<!DOCTYPE html>
+<html>
+    <head>
+        <script src="{{ asset('js/test.js') }}" defer></script>
+    </head>
+    <body>
+        <div id="app-root">
+            APP-ROOT-DIV
+        </div>
+    </body>
+</html>
+```
+
+
+## create type definition file for JSX
+create file ./resources/js/shims-tsx.d.ts
+import Vue, { VNode } from 'vue';
+
+declare global {
+  namespace JSX {
+    // tslint:disable no-empty-interface
+    interface Element extends VNode {}
+    // tslint:disable no-empty-interface
+    interface ElementClass extends Vue {}
+    interface IntrinsicElements {
+      [elem: string]: any;
+    }
+  }
+}
+
+
+
+
+
+## create Vue app
+create file ./resources/js/test.tsx
+
+```import { Component, Vue } from 'vue-property-decorator';
+import { CreateElement, VNode } from 'vue';
+
+@Component({
+})
+class Tmp extends Vue {
+  render(h: CreateElement): VNode {
+    return (
+      <div id="first">
+        First Div
+        <div id="second">
+            Second Div
+          <div id="third">
+            Third Div
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+new Vue({
+  render: (h: CreateElement) => <Tmp></Tmp>,
+}).$mount('#app-root');
+```
+
+
+
+## modify webpack config for mix
+modify ./webpack.mix.js
+
+```mix.webpackConfig({
+   resolve: {
+      extensions: ['.ts', '.tsx', '.js', '.jsx', '.vue'],
+      alias: {
+         '@': __dirname + '/resources/js'
+      }
+   },
+})
+
+mix.ts('resources/js/test.tsx', 'public/js');
+
+mix.extend(
+   'overwriteRuleForTsx',
+   new class {
+      webpackConfig(webpackConfig) {
+         webpackConfig.module.rules.forEach(function(rule, index){
+            if ('' + rule.test === '' + /\.tsx?$/) {
+               if (rule.loader) {
+                  delete rule['loader'];
+               }
+               if (rule.options) {
+                  delete rule['options'];
+               }
+               rule.use = [
+                  {
+                     loader: 'babel-loader'
+                  },
+                  {
+                     loader: 'ts-loader'
+                  }
+               ];
+            }
+         }) ;
+      }
+   }()
+)
+
+mix.overwriteRuleForTsx();
+```
+
+
+
+
+## transpile assets
+`npm run dev`
+
+
+## run server
+`php artisan serve`
+
+## check result
+
+http://localhost:8000/test
+
+
+
+## notice
+It's important to set "jsx" to "preserve" in tsconfig.json.
+If you set "jsx" to "react", and "jsxFactory" to "h", only first div is transpiled and children disappear.
+
+laravel mix has only one loader 'ts-loader' for 'tsx' file.
+laravel mix doesn't use 'babel-loader' after applying 'ts-loader'
+We have to replace module.rules for 'tsx' to use both 'babel-loader' and 'ts-loader'.
+
+
