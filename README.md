@@ -12,7 +12,8 @@ Setting up laravel mix + Vue.js + TypeScript + TSX
 ## install node_modules
 `cd Vue-TSX-LaravelMix`
 
-```npm install
+```
+npm install
 npm install --save-dev @babel/plugin-syntax-jsx
 npm install --save-dev @vue/babel-plugin-transform-vue-jsx
 npm install --save-dev @vue/babel-helper-vue-jsx-merge-props
@@ -24,7 +25,8 @@ npm install --save-dev vue-property-decorator
 ## create babel config file
 create file named '.babelrc'
 
-```{
+```
+{
     "plugins": ["@vue/babel-plugin-transform-vue-jsx"]
 }
 ```
@@ -34,7 +36,8 @@ create file named '.babelrc'
 ## create ts config file
 create file named 'tsconfig.json'
 
-```{
+```
+{
   "compilerOptions": {
     "target": "es5",
     "module": "esnext",
@@ -77,7 +80,8 @@ create file named 'tsconfig.json'
 ## create route for test page
 modify ./routes/web.php
 
-```Route::get('/', function () {
+```
+Route::get('/', function () {
     return view('welcome');
 });
 
@@ -92,7 +96,8 @@ Route::get('/test', function () {
 ## create view for test page
 create file ./resources/views/test.blade.php
 
-```<!DOCTYPE html>
+```
+<!DOCTYPE html>
 <html>
     <head>
         <script src="{{ asset('js/test.js') }}" defer></script>
@@ -108,6 +113,8 @@ create file ./resources/views/test.blade.php
 
 ## create type definition file for JSX
 create file ./resources/js/shims-tsx.d.ts
+
+```
 import Vue, { VNode } from 'vue';
 
 declare global {
@@ -121,7 +128,7 @@ declare global {
     }
   }
 }
-
+```
 
 
 
@@ -129,7 +136,8 @@ declare global {
 ## create Vue app
 create file ./resources/js/test.tsx
 
-```import { Component, Vue } from 'vue-property-decorator';
+```
+import { Component, Vue } from 'vue-property-decorator';
 import { CreateElement, VNode } from 'vue';
 
 @Component({
@@ -160,7 +168,8 @@ new Vue({
 ## modify webpack config for mix
 modify ./webpack.mix.js
 
-```mix.webpackConfig({
+```
+mix.webpackConfig({
    resolve: {
       extensions: ['.ts', '.tsx', '.js', '.jsx', '.vue'],
       alias: {
@@ -218,10 +227,38 @@ http://localhost:8000/test
 
 ## notice
 It's important to set "jsx" to "preserve" in tsconfig.json.
+```
+{
+    "compilerOptions": {
+        "jsx": "preserve"
+    }
+}
+```
 If you set "jsx" to "react", and "jsxFactory" to "h", only first div is transpiled and children disappear.
 
 laravel mix has only one loader 'ts-loader' for 'tsx' file.
+
+`./node_modules/laravel-mix/src/components/TypeScript.js`
+
+```
+    /**
+     * webpack rules to be appended to the master config.
+     */
+    webpackRules() {
+        return [].concat(super.webpackRules(), {
+            test: /\.tsx?$/,
+            loader: 'ts-loader',
+            exclude: /node_modules/,
+            options: {
+                appendTsSuffixTo: [/\.vue$/]
+            }
+        });
+    }
+
+```
+
 laravel mix doesn't use 'babel-loader' after applying 'ts-loader'
 We have to replace module.rules for 'tsx' to use both 'babel-loader' and 'ts-loader'.
 
 
+I hope everyone have fun of typed front end application.
