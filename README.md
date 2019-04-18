@@ -308,4 +308,4 @@ when loading the code with no type information by step 3, you can get a storm of
 
 
 # Finally
-I hope everyone have a fun of typed front end application.
+I hope everyone have a fun of constructing typed frontend application.
