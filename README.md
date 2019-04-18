@@ -1,9 +1,17 @@
-# FxRepo1
-Repository for Test
+# Vue.js + TSX on Laravel Mix
 
 Setting up laravel mix + Vue.js + TypeScript + TSX
 
+# Overview
 
+To use Vue.js + TSX on Laravel Mix, you need to do
+
+- install plugins for JSX transpile.
+- create a few config files for ts-loader and babel-loader.
+- overwrite webpack.config.js to use appropriate loader for TSX
+
+
+# Detail
 
 ## create laravel project
 `composer create-project --prefer-dist laravel/laravel Vue-TSX-LaravelMix`
@@ -17,7 +25,7 @@ npm install
 npm install --save-dev @babel/plugin-syntax-jsx
 npm install --save-dev @vue/babel-plugin-transform-vue-jsx
 npm install --save-dev @vue/babel-helper-vue-jsx-merge-props
-npm install --save-dev @babel/plugin-syntax-jsx @vue/babel-plugin-transform-vue-jsx @vue/babel-helper-vue-jsx-merge-props
+
 npm install --save-dev vue-property-decorator
 ```
 
