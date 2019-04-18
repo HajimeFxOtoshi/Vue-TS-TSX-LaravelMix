@@ -271,4 +271,41 @@ laravel mix doesn't use 'babel-loader' after applying 'ts-loader'
 We have to replace module.rules for 'tsx' to use both 'babel-loader' and 'ts-loader'.
 
 
+## notice 3. wrong setting example of webpack.mix.js
+this is a wrong example of webpack.mix.js
+
+```
+mix.webpackConfig({
+   module: {
+      rules: [
+         {
+            test: /\.tsx$/,
+            use: [
+               {
+                  loader: 'babel-loader'
+               },
+               {
+                  loader: 'ts-loader'
+               }
+            ]
+         }
+      ]
+   }
+})
+```
+
+laravel mix just **appends** custom config, so if you write custom config just like above, webpack will use following loaders.
+
+```
+1. ts-loader (custom config written by you)
+2. babel-loader (custom config written by you)
+3. ts-loader (again! this is written in ./node_modules/laravel-mix/src/components/TypeScript.js)
+```
+
+after 1., code is transpiled from ts to js, so every type information disappear.
+when loading the code with no type information by step 3, you can get a storm of warnings and errors.
+(but code itself works fine.)
+
+
+# Finally
 I hope everyone have a fun of typed front end application.
