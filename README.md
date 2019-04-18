@@ -225,7 +225,7 @@ http://localhost:8000/test
 
 
 
-## notice
+## notice 1. set "jsx" to "preserve"
 It's important to set "jsx" to "preserve" in tsconfig.json.
 ```
 {
@@ -236,6 +236,8 @@ It's important to set "jsx" to "preserve" in tsconfig.json.
 ```
 If you set "jsx" to "react", and "jsxFactory" to "h", only first div is transpiled and children disappear.
 
+
+## notice 2. overwrite webpack's rule for tsx
 laravel mix has only one loader 'ts-loader' for 'tsx' file.
 
 `./node_modules/laravel-mix/src/components/TypeScript.js`
@@ -261,4 +263,4 @@ laravel mix doesn't use 'babel-loader' after applying 'ts-loader'
 We have to replace module.rules for 'tsx' to use both 'babel-loader' and 'ts-loader'.
 
 
-I hope everyone have fun of typed front end application.
+I hope everyone have a fun of typed front end application.
